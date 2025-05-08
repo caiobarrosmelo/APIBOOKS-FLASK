@@ -45,6 +45,51 @@ def add_book():
     db.session.commit()
     return jsonify({"message": "Livro adicionado com sucesso!"}), 201
 
+# GET
+@app.route("/books", methods=["GET"])
+def get_books():
+    books = Book.query.all()
+    result = [ 
+        {"id": book.id, "author": book.author, "genre": book.genre, "year": book.year, "title": book.title
+        } for 
+        book in books
+    ]
+    return jsonify(result), 200
+
+@app.route("/books/<int:book_id>", methods=["GET"])
+def get_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    result = {
+        "id": book.id,
+        "author": book.author,
+        "genre": book.genre,
+        "year": book.year,
+        "title": book.title
+    }
+    return jsonify(result), 200
+
+# PUT
+@app.route("/books/<int:book_id>", methods=["PUT"])
+def update_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    data = request.get_json()
+
+    book.author = data.get["author", book.author]
+    book.genre = data.get["genre", book.genre]
+    book.year = data.get["year", book.year]
+    book.title = data.get["title", book.title]
+    
+    db.session.commit()
+    return jsonify({"message": "Livro atualizado com sucesso!"}), 200
+    
+# DELETE
+@app.route("/books/<int:book_id>", methods=["DELETE"])
+def delete_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    return jsonify({"message": "Livro deletado com sucesso!"}), 200
+
 
 @app.route("/")
 def hello_world():
