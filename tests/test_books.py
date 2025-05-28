@@ -49,7 +49,8 @@ def test_update_book(client):
 
     response = client.put("/books/1", json={"title": "New Title"})
     assert response.status_code == 200
-    assert b"Livro atualizado com sucesso" in response.data
+    json_data = response.get_json()
+    assert json_data["title"] == "New Title"
 
     updated = client.get("/books/1")
     assert updated.get_json()["title"] == "New Title"
@@ -63,8 +64,8 @@ def test_delete_book(client):
         "genre": "Mistério"
     })
     response = client.delete("/books/1")
-    assert response.status_code == 200
-    assert b"Livro removido com sucesso" in response.data
+    assert response.status_code == 204
+    assert response.data == b""  # 204 = No Content
 
     # Verifica se sumiu
     response = client.get("/books/1")
